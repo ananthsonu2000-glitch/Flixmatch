@@ -27,6 +27,7 @@ export interface Database {
           partnerB_token: string | null;
           expires_at: string;
           created_at: string;
+          error_message: string | null;
         };
         Insert: {
           id?: string;
@@ -39,6 +40,7 @@ export interface Database {
           partnerB_token?: string | null;
           expires_at?: string;
           created_at?: string;
+          error_message?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["sessions"]["Insert"]>;
         Relationships: [];

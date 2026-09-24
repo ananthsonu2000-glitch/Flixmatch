@@ -267,15 +267,36 @@ function WaitingRoomWithRetry({
 }) {
   const [showRetry, setShowRetry] = useState(false);
   const [retrying, setRetrying] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setShowRetry(true), 25000);
     return () => clearTimeout(t);
   }, []);
 
+  // Poll for a stored failure reason so a stuck generation shows *why*
+  // instead of just "taking a while" forever.
+  useEffect(() => {
+    let cancelled = false;
+    const poll = () => {
+      getSessionState(sessionId).then((res) => {
+        if (!cancelled) setLastError(res.session.error_message);
+      });
+    };
+    poll();
+    const interval = setInterval(poll, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [sessionId]);
+
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-4">
+    <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6 text-center">
       <WaitingRoom title={title} subtitle={subtitle} />
+      {lastError && (
+        <p className="text-sm text-[var(--pass)] max-w-sm">Last attempt failed: {lastError}</p>
+      )}
       {showRetry && (
         <button
           disabled={retrying}

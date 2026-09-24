@@ -6,6 +6,8 @@ import { generateRoundTwoPool } from "@/lib/pool-generation";
 import { errorResponse } from "@/lib/apiError";
 import type { Partner } from "@/lib/types";
 
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -37,8 +39,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         try {
           await generateRoundTwoPool(id);
         } catch (err) {
+          const message = err instanceof Error ? err.message : "Unknown error";
           console.error("round 2 pool generation failed", err);
-          await db.from("sessions").update({ status: "swiping", round: 1 }).eq("id", id);
+          await db.from("sessions").update({ status: "swiping", round: 1, error_message: message }).eq("id", id);
         }
       });
     }

@@ -9,7 +9,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     const { data: session, error } = await db
       .from("sessions")
-      .select("id, status, round, partnerA_claimed, partnerB_claimed, expires_at")
+      .select("id, status, round, partnerA_claimed, partnerB_claimed, expires_at, error_message")
       .eq("id", id)
       .single();
 

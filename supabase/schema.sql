@@ -27,8 +27,11 @@ create table if not exists sessions (
   "partnerB_claimed" boolean not null default false,
   "partnerB_token" uuid,
   expires_at timestamptz not null default (now() + interval '48 hours'),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  error_message text
 );
+
+alter table sessions add column if not exists error_message text;
 
 create table if not exists preferences (
   id uuid primary key default gen_random_uuid(),

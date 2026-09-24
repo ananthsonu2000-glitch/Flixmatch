@@ -4,6 +4,8 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { generateRoundOnePool } from "@/lib/pool-generation";
 import { errorResponse } from "@/lib/apiError";
 
+export const maxDuration = 60;
+
 // Manual recovery path if brief/pool generation errored out and left the
 // session stuck at 'both_submitted' (e.g. a transient TMDB/RapidAPI failure).
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -13,7 +15,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
     const { data, error } = await db
       .from("sessions")
-      .update({ status: "generating_brief" })
+      .update({ status: "generating_brief", error_message: null })
       .eq("id", id)
       .eq("status", "both_submitted")
       .select("id")
@@ -26,8 +28,9 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
       try {
         await generateRoundOnePool(id);
       } catch (err) {
+        const message = err instanceof Error ? err.message : "Unknown error";
         console.error("retry: round 1 pool generation failed", err);
-        await db.from("sessions").update({ status: "both_submitted" }).eq("id", id);
+        await db.from("sessions").update({ status: "both_submitted", error_message: message }).eq("id", id);
       }
     });
 

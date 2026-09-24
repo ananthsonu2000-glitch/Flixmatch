@@ -6,6 +6,11 @@ import { generateRoundOnePool } from "@/lib/pool-generation";
 import { errorResponse } from "@/lib/apiError";
 import type { Partner, PreferenceInput } from "@/lib/types";
 
+// Pool generation (Gemini + TMDB + serialized RapidAPI enrichment) can take
+// 30-40s+, well past Vercel's default 10s function timeout on the Hobby
+// plan. 60 is the Hobby-plan ceiling; raise further if on a paid plan.
+export const maxDuration = 60;
+
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
@@ -45,14 +50,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // Flip to 'generating_brief' immediately and return — the Gemini/TMDB/
       // RapidAPI pipeline can take 10-40s, too long to hold the HTTP response
       // open. Clients watch the status transition via Realtime.
-      await db.from("sessions").update({ status: "generating_brief" }).eq("id", id);
+      await db.from("sessions").update({ status: "generating_brief", error_message: null }).eq("id", id);
 
       after(async () => {
         try {
           await generateRoundOnePool(id);
         } catch (err) {
+          const message = err instanceof Error ? err.message : "Unknown error";
           console.error("round 1 pool generation failed", err);
-          await db.from("sessions").update({ status: "both_submitted" }).eq("id", id);
+          await db.from("sessions").update({ status: "both_submitted", error_message: message }).eq("id", id);
         }
       });
     }

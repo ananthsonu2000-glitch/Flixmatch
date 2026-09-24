@@ -33,7 +33,7 @@ export function joinSession(sessionId: string) {
 
 export function getSessionState(sessionId: string) {
   return j<{
-    session: { id: string; status: SessionStatus; round: number };
+    session: { id: string; status: SessionStatus; round: number; error_message: string | null };
     match: { tmdb_id: number; round: number } | null;
   }>(fetch(`/api/sessions/${sessionId}`));
 }
