@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0b0b12;
+  --bg-elevated: #14141f;
+  --surface: #1a1a28;
+  --surface-2: #20202f;
+  --border: #2a2a3c;
+  --text: #f4f3f7;
+  --text-dim: #9d9bb0;
+  --accent: #ff5470;
+  --accent-2: #ff8a5b;
+  --accent-3: #7c5cff;
+  --like: #2ee6a6;
+  --pass: #ff5470;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-text-dim: var(--text-dim);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-sans);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: radial-gradient(circle at 15% 0%, #241a3a 0%, var(--bg) 45%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans), -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior-y: none;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.gradient-text {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 60%, var(--accent-3) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #14090c;
+  font-weight: 700;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  box-shadow: 0 8px 24px -8px rgba(255, 84, 112, 0.55);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+.btn-primary:disabled {
+  opacity: 0.45;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn-secondary:active {
+  transform: scale(0.97);
+}
+
+.chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  transition: all 0.15s ease;
+}
+.chip[data-selected="true"] {
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 100%);
+  color: #14090c;
+  font-weight: 600;
+}
+
+.card-shell {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
