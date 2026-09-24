@@ -4,8 +4,14 @@ import type { Identity, PreferenceInput, SessionStatus, SwipeDirection, TitlePoo
 
 async function j<T>(resPromise: Promise<Response>): Promise<T> {
   const res = await resPromise;
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error ?? `request failed (${res.status})`);
+  const text = await res.text();
+  let data: Record<string, unknown>;
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new Error(`request failed (${res.status}): ${text.slice(0, 200) || "empty response"}`);
+  }
+  if (!res.ok) throw new Error((data.error as string) ?? `request failed (${res.status})`);
   return data as T;
 }
 
