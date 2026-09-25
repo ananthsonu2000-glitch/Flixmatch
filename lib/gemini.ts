@@ -40,7 +40,7 @@ function client() {
 
 function briefModel() {
   return client().getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.8-flash",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: briefSchema,
